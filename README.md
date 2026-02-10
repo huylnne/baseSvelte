@@ -1,43 +1,169 @@
-# Svelte + Vite
+# Svelte Hello World - 3D Viewer Container
 
-This template should help get you started developing with Svelte in Vite.
+Đây là một ứng dụng demo Svelte + Vite, chuẩn bị để tích hợp 3D viewer (HOOPS/WebGL) sau này.
+
+## Cấu trúc Project
+
+```
+svelte-hello/
+├── src/
+│   ├── main.js              # Entry point của ứng dụng
+│   ├── App.svelte           # Component chính
+│   ├── app.css              # Global styles
+│   ├── components/
+│   │   ├── Header.svelte    # Header component
+│   │   └── ViewerContainer.svelte  # Container cho 3D viewer
+│   └── lib/
+│       └── Counter.svelte   # Counter component mẫu
+├── public/                  # Static assets
+├── index.html              # HTML template
+├── vite.config.js          # Vite configuration
+├── svelte.config.js        # Svelte configuration
+└── package.json            # Dependencies
+```
+
+## Yêu cầu hệ thống
+
+- Node.js 16+ 
+- npm hoặc yarn
+
+## Cài đặt
+
+1. Clone hoặc tải project về máy
+
+2. Cài đặt dependencies:
+```bash
+npm install
+```
+
+## Chạy ứng dụng
+
+### Chế độ Development
+```bash
+npm run dev
+```
+Ứng dụng sẽ chạy tại `http://localhost:5173` (hoặc port khác nếu 5173 đã được sử dụng)
+
+### Build cho Production
+```bash
+npm run build
+```
+Tạo build tối ưu trong thư mục `dist/`
+
+### Preview bản build
+```bash
+npm run preview
+```
+Xem trước bản build production tại local
+
+## Các Component chính
+
+### App.svelte
+Component gốc của ứng dụng, chứa layout chính với [`Header`](src/components/Header.svelte) và [`ViewerContainer`](src/components/ViewerContainer.svelte).
+
+### Header.svelte
+Hiển thị tiêu đề và mô tả ứng dụng.
+
+### ViewerContainer.svelte
+Container dành cho việc tích hợp 3D viewer trong tương lai. Component này:
+- Sử dụng `onMount` để khởi tạo viewer khi component được mount
+- Có sẵn cleanup logic trong `onDestroy`
+- Hiện tại hiển thị placeholder với kích thước 520px height
+
+## Tích hợp 3D Viewer (Kế hoạch)
+
+Để tích hợp HOOPS hoặc WebGL viewer, chỉnh sửa [`ViewerContainer.svelte`](src/components/ViewerContainer.svelte):
+
+```javascript
+onMount(() => {
+  // Uncomment và implement các function này
+  initViewer(viewerEl);
+
+  return () => {
+    destroyViewer();
+  };
+});
+```
 
 ## Recommended IDE Setup
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+[VS Code](https://code.visualstudio.com/) + [Svelte for VS Code](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode)
 
-## Need an official Svelte framework?
+## Tính năng kỹ thuật
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+### Svelte 5
+Project sử dụng Svelte 5 với cú pháp mới:
+- `$state` runes cho reactive state (xem [`Counter.svelte`](src/lib/Counter.svelte))
+- `onMount` và `onDestroy` lifecycle hooks
 
-## Technical considerations
+### Vite
+- Hot Module Replacement (HMR)
+- Fast development server
+- Optimized production builds
 
-**Why use this over SvelteKit?**
+### Styling
+- Global styles trong [`app.css`](src/app.css)
+- Component-scoped styles
+- Dark/Light mode support
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+## Cấu hình
 
-This template contains as little as possible to get started with Vite + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+### jsconfig.json
+Đã cấu hình:
+- `checkJs: true` - Type checking cho JavaScript
+- `moduleResolution: "bundler"`
+- Support cho Svelte files
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
-
-**Why include `.vscode/extensions.json`?**
-
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
-
-**Why enable `checkJs` in the JS template?**
-
-It is likely that most cases of changing variable types in runtime are likely to be accidental, rather than deliberate. This provides advanced typechecking out of the box. Should you like to take advantage of the dynamically-typed nature of JavaScript, it is trivial to change the configuration.
-
-**Why is HMR not preserving my local component state?**
-
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/sveltejs/svelte-hmr/tree/master/packages/svelte-hmr#preservation-of-local-state).
-
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
-
-```js
-// store.js
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
+### vite.config.js
+Cấu hình cơ bản với Svelte plugin, có thể mở rộng thêm:
+```javascript
+// Thêm alias, proxy, v.v...
 ```
+
+## HMR và State Management
+
+⚠️ **Lưu ý**: HMR không preserve local component state mặc định.
+
+Nếu cần giữ state quan trọng, tạo external store:
+
+```javascript
+// src/stores/viewer.js
+import { writable } from 'svelte/store'
+export const viewerState = writable({
+  isLoaded: false,
+  model: null
+})
+```
+
+Chi tiết: [svelte-hmr documentation](https://github.com/sveltejs/svelte-hmr/tree/master/packages/svelte-hmr#preservation-of-local-state)
+
+## Troubleshooting
+
+### Port đã được sử dụng
+Vite sẽ tự động chọn port khác. Hoặc chỉ định port cụ thể trong [`vite.config.js`](vite.config.js):
+```javascript
+export default defineConfig({
+  plugins: [svelte()],
+  server: {
+    port: 3000
+  }
+})
+```
+
+### Module not found
+Chạy lại:
+```bash
+npm install
+```
+
+## Nâng cấp lên SvelteKit
+
+Nếu cần routing và SSR, có thể migrate sang [SvelteKit](https://kit.svelte.dev/). Project structure đã tương thích để dễ migration.
+
+## License
+
+MIT
+
+## Liên hệ
+
+Để biết thêm chi tiết về Svelte, xem [Svelte documentation](https://svelte.dev/docs).
